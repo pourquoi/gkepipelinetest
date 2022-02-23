@@ -2,7 +2,6 @@ name: CI
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  COMPOSE_FILE: docker-compose.yml:docker-compose.override.github.yml
   GAR_LOCATION: europe-west1
   REPOSITORY: repo-1
   GKE_CLUSTER: cluster-2
@@ -18,6 +17,10 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+
+    env:
+      COMPOSE_FILE: docker-compose.yml:docker-compose.override.github.yml
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -94,7 +97,11 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-      
+
+    env:
+      COMPOSE_FILE: docker-compose.release.yml
+      API_ENDPOINT: https://api.cataclop-test.com
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -143,7 +150,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-      
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -154,7 +161,7 @@ jobs:
         with:
           token_format: 'access_token'
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
-  
+
       - name: Set up GKE credentials
         uses: google-github-actions/get-gke-credentials@v0
         with:

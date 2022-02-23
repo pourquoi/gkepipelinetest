@@ -1,8 +1,23 @@
 version: "3.4"
 
 services:
+  php:
+    platform: linux/amd64
+    image: ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:apiBackend-${GITHUB_SHA}
+    build:
+      context: ./api
+      target: api-php
+
+  api:
+    platform: linux/amd64
+    image: ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:apiProxy-${GITHUB_SHA}
+    build:
+      context: ./api
+      target: api-proxy
+
   client:
     platform: linux/amd64
+    image: ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:client-${GITHUB_SHA}
     build:
       context: ./client
       target: client-prod
