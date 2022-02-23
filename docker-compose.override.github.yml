@@ -25,3 +25,4 @@ services:
         - ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:client-latest
     ports:
       - "80:80"
+    command: nginx -g 'daemon off;'
