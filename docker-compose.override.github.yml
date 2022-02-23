@@ -18,6 +18,9 @@ services:
   client:
     image: ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:client-${GITHUB_SHA}
     build:
+      target: client-prod
+      args:
+        API_ENDPOINT: ${API_ENDPOINT}
       cache_from:
         - ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:client-latest
     ports:
