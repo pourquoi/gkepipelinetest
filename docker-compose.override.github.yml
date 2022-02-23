@@ -12,8 +12,6 @@ services:
     build:
       cache_from:
         - ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:api-latest
-    ports:
-      - "8080:80"
 
   client:
     image: ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:client-${GITHUB_SHA}
@@ -23,6 +21,4 @@ services:
         API_ENDPOINT: ${API_ENDPOINT}
       cache_from:
         - ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:client-latest
-    ports:
-      - "80:80"
     command: nginx -g 'daemon off;'

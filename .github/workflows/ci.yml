@@ -51,9 +51,9 @@ jobs:
           done
           exit 1
       - name: API health check
-        run: curl -v -o /dev/null http://localhost:8080/health
+        run: curl -v -o /dev/null http://localhost:8081/health
       - name: Client health check
-        run: curl -v -o /dev/null http://localhost
+        run: curl -v -o /dev/null http://localhost:8080
       - name: Create test database
         run: |
           docker-compose exec -T php bin/console -e test doctrine:database:create
