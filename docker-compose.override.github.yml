@@ -22,3 +22,5 @@ services:
       cache_from:
         - ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:client-latest
     command: nginx -g 'daemon off;'
+    ports:
+      - "80:80"
