@@ -15,27 +15,41 @@ on:
 jobs:
   tests:
     name: Tests
-    environment: dev
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Pull images
-        run: docker-compose pull --ignore-pull-failures || true
-      - uses: actions/cache@v2
+
+      - name: Cache Composer
+        uses: actions/cache@v2
         with:
           path: api/composer
           key: ${{ runner.os }}-composer-${{ hashFiles('api/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-      - uses: actions/cache@v2
+
+      - name: Cache Yarn
+        uses: actions/cache@v2
         with:
           path: client/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('client/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          token_format: 'access_token'
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: Docker configuration
+        run: |-
+          echo ${{ steps.auth.outputs.access_token }} | docker login -u oauth2accesstoken --password-stdin https://$GAR_LOCATION-docker.pkg.dev
+
       - name: Start services
         run: docker-compose up --build -d
+
       - name: Wait for services
         run: |
           while status="$(docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" "$(docker-compose ps -q php)")"; do
@@ -50,16 +64,21 @@ jobs:
             esac
           done
           exit 1
+
       - name: API health check
         run: curl -v -o /dev/null http://localhost:8081/health
+
       - name: Client health check
         run: curl -v -o /dev/null http://localhost
+
       - name: Create test database
         run: |
           docker-compose exec -T php bin/console -e test doctrine:database:create
           docker-compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
+
       - name: PHPUnit
         run: docker-compose exec -T php bin/phpunit
+
       - name: Doctrine Schema Validator
         run: docker-compose exec -T php bin/console doctrine:schema:validate --skip-sync
 
@@ -73,10 +92,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - id: 'auth'
-        name: Authenticate to Google Cloud
+      - name: Authenticate to Google Cloud
+        id: auth
         uses: 'google-github-actions/auth@v0'
         with:
+          token_format: 'access_token'
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
       - name: Docker configuration
