@@ -1,0 +1,10 @@
+App\Entity\User:
+    user (template):
+        enabled: true
+        roles: [ROLE_USER]
+        createdAt: <(new DateTime('-10 days'))>
+        updatedAt: <(new DateTime('-10 days'))>
+
+    user_{1..10} (extends user):
+        email: <email()>
+        password: '\$2y\$13\$1QHbArbGd6G1mw3YVEHOFO1I.ONZYGIxo.O99C7WZFX08Lq.2.R1i'

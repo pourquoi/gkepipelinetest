@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cataclop-app
+  labels:
+    project: cataclop
+    env: {{ .Values.kubernetesEnv }}
+data:
+  APP_ENV: {{ .Values.env | quote }}
+  DB_INSTANCE: {{ .Values.dbInstance | quote }}
+  PHP_UPSTREAM: "127.0.0.1:9000"
+  TRUSTED_HOSTS: {{ .Values.apiBackend.trustedHosts | quote }}
+  TRUSTED_PROXIES: "{{ join "," .Values.apiBackend.trustedProxies }}"

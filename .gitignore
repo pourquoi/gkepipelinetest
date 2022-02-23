@@ -1,0 +1,9 @@
+.idea
+/.env
+.DS_Store
+/docker-compose.override.yml
+.vscode
+.history
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json

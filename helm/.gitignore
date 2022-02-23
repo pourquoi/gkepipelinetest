@@ -1,0 +1,4 @@
+/app/charts/*
+!/app/charts/.gitignore
+/app/**/secret.yml
+/app/keys/

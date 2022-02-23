@@ -1,0 +1,10 @@
+version: "3.4"
+
+services:
+  client:
+    platform: linux/amd64
+    build:
+      context: ./client
+      target: client-prod
+      args:
+        API_ENDPOINT: ${API_ENDPOINT}

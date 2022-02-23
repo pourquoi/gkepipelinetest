@@ -1,0 +1,54 @@
+# Default values for app.
+# Override environment specific values in staging/values.yaml and prod/values.yaml
+
+kubernetesEnv: dev
+containerImageRepository: europe-west1-docker.pkg.dev/cataclop/repo-1/dev
+dbInstance: "cataclop:europe-west1:cataclop-test"
+env: prod
+
+ingress:
+  globalStaticIpName: cataclop-test-ip
+
+api:
+  replicaCount: 1
+
+apiBackend:
+  tag: "apiBackend-latest"
+  # todo change this
+  trustedHosts: '(10\..+|.*)'
+  trustedProxies:
+    - "127.0.0.1"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+apiProxy:
+  tag: "apiProxy-latest"
+  host: "api.cataclop-test.com"
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+client:
+  tag: "client-latest"
+  replicaCount: 1
+  host: "client.cataclop-test.com"
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+  

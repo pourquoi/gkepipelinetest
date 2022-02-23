@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cataclop
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: {{ .Values.ingress.globalStaticIpName }}
+    networking.gke.io/managed-certificates: managed-cert
+  labels:
+    project: cataclop
+    env: {{ .Values.kubernetesEnv }}
+spec:
+  rules:
+    - host: {{ .Values.apiProxy.host }}
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: api
+                port:
+                  number: 80
+    - host: {{ .Values.client.host }}
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: client
+                port:
+                  number: 80

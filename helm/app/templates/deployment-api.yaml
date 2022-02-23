@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    project: cataclop
+    env: {{ .Values.kubernetesEnv }}
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      annotations:
+        "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
+      labels:
+        app: api
+        service: api
+        project: cataclop
+        env: {{ .Values.kubernetesEnv }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-api-backend
+          image: "{{ .Values.containerImageRepository }}:{{ .Values.apiBackend.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: cataclop-app
+            - secretRef:
+                name: cataclop-app
+          livenessProbe:
+            tcpSocket:
+              port: 9000
+          readinessProbe:
+            tcpSocket:
+              port: 9000
+          resources:
+            {{- toYaml .Values.apiBackend.resources | nindent 12 }}
+
+        - name: {{ .Chart.Name }}-api-proxy
+          image: "{{ .Values.containerImageRepository }}:{{ .Values.apiProxy.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: PHP_UPSTREAM
+              valueFrom:
+                configMapKeyRef:
+                  name: cataclop-app
+                  key: PHP_UPSTREAM
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          
+        - name: {{ .Chart.Name }}-cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.28.0
+          env:
+            - name: DB_INSTANCE
+              valueFrom:
+                configMapKeyRef:
+                  name: cataclop-app
+                  key: DB_INSTANCE
+          command:
+            - '/cloud_sql_proxy'
+            - '-instances=$(DB_INSTANCE)=tcp:5432'
+            - '-credential_file=/secrets/service_account.json'
+          securityContext:
+            runAsNonRoot: true
+          volumeMounts:
+            - name: gcp-service-account
+              mountPath: /secrets/
+              readOnly: true
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+      volumes:
+        - name: gcp-service-account
+          secret:
+            secretName: app-1-sa
