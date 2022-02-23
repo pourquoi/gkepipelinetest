@@ -89,13 +89,10 @@ test: test-db test-php test-client test-admin ## Run tests
 test-db: vendor-php
 	$(RUN_PHP) sh -c "php bin/console d:d:c --if-not-exists && php bin/console d:m:m -n && php bin/console d:s:v"
 
-test-php: test-php-phpunit test-php-behat ## Run API tests
+test-php: test-php-phpunit ## Run API tests
 
 test-php-phpunit: vendor-php ## Run PHPUnit tests
 	$(RUN_PHP) sh -c "php vendor/bin/simple-phpunit"
-
-test-php-behat: ## Run Behat tests
-	$(RUN_PHP_TEST_ENV) php vendor/bin/behat
 
 test-client: vendor-client ## Run client tests
 	$(RUN_CLIENT) sh -c "CI=true yarn test --colors"

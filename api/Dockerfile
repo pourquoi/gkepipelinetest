@@ -92,6 +92,7 @@ RUN set -eux; \
 
 # copy only specifically what we need
 COPY .env ./
+COPY .env.test ./
 COPY bin bin/
 COPY config config/
 COPY migrations migrations/
